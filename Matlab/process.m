@@ -8,8 +8,9 @@ for i=1:length(P)
     color2=color(P(i,10)+1,:);
     for j=11:5:131
         if (P(i,j+1)==2)
-            axis([ -1 1 -1 1 0 5]);
-            plot3(P(i,j+2),P(i,j+3),P(i,j+4),'o','Color',color2);
+            axis([ -1 1 0 5 -1 1]);
+            view(3);
+            plot3(P(i,j+2),P(i,j+4),P(i,j+3),'o','Color',color2);
         end
     end
     if P(i,1)>nsec
