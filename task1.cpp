@@ -31,6 +31,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	cv::setUseOptimized(true);
 
 	// File
+	int64 nsec = 0;
 	ofstream fs;
 	string msec;
 	FILETIME ft_now;
@@ -143,7 +144,8 @@ int _tmain(int argc, _TCHAR* argv[])
 				IBody* pBody[BODY_COUNT] = { 0 };
 				hresult = pBodyFrame->GetAndRefreshBodyData(BODY_COUNT, pBody);
 				if (SUCCEEDED(hresult)){
-                    //GetTime
+                    //GetTime and nsec
+					nsec = nsec + 1;
 					GetLocalTime(&st);
 					GetSystemTimeAsFileTime(&ft_now);
 					ll_now = (LONGLONG)ft_now.dwLowDateTime + ((LONGLONG)(ft_now.dwHighDateTime) << 32LL);
@@ -154,7 +156,7 @@ int _tmain(int argc, _TCHAR* argv[])
 						hresult = pBody[count]->get_IsTracked(&bTracked);
 						if (SUCCEEDED(hresult) && bTracked){
 							std::cout <<"Body "<<count<<" is being tracked"<< std::endl;
-							fs << ll_now << " " << st.wYear << " " << st.wMonth << " " << st.wDay << " " << st.wHour << " " << st.wMinute << " " << st.wSecond << " " << st.wMilliseconds << " " << count << " ";
+							fs << nsec << " " << ll_now << " " << st.wYear << " " << st.wMonth << " " << st.wDay << " " << st.wHour << " " << st.wMinute << " " << st.wSecond << " " << st.wMilliseconds << " " << count << " ";
 							Joint joint[JointType::JointType_Count];
 							hresult = pBody[count]->GetJoints(JointType::JointType_Count, joint);
 							if (SUCCEEDED(hresult)){

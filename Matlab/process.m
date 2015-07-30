@@ -1,15 +1,20 @@
-load('P1.txt');
+P=load('P4.txt');
 color=[1 0 0;0 1 0;0 0 1; 1 1 0;1 0 1; 0 1 1];
 figure();
 hold on;
-for i=1:length(P1)
+nsec=P(1,1);
+for i=1:length(P)
     hold on;
-    color2=color(P1(i,9),:);
-    for j=10:5:130
-        if (P1(i,j+1)==2)
-            plot3(P1(i,j+2),P1(i,j+3),P1(i,j+4),'o','Color',color2);
+    color2=color(P(i,10)+1,:);
+    for j=11:5:131
+        if (P(i,j+1)==2)
+            axis([ -1 1 -1 1 0 5]);
+            plot3(P(i,j+2),P(i,j+3),P(i,j+4),'o','Color',color2);
         end
     end
-    pause(0.1);
+    if P(i,1)>nsec
+    nsec=P(i,1);
+    pause(0.01);
     clf;
+    end
 end
