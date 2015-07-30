@@ -4,6 +4,12 @@
 #include <Windows.h>
 #include <Kinect.h>
 #include <opencv2/opencv.hpp>
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <time.h>
+using namespace std;
+
 
 template<class Interface>
 inline void SafeRelease(Interface *& pInterfaceToRelease){
@@ -13,9 +19,29 @@ inline void SafeRelease(Interface *& pInterfaceToRelease){
 	}
 }
 
+string convertInt(int64 number)
+{
+	stringstream ss; //create a stringstream
+	ss << number; //add number to the stream
+	return ss.str(); //return a string with the contents of the stream
+}
+
 int _tmain(int argc, _TCHAR* argv[])
 {
 	cv::setUseOptimized(true);
+
+	// File
+	ofstream fs;
+	string msec;
+	FILETIME ft_now;
+	SYSTEMTIME st;
+	GetSystemTimeAsFileTime(&ft_now);
+	int64 ll_now;
+	ll_now = (LONGLONG)ft_now.dwLowDateTime + ((LONGLONG)(ft_now.dwHighDateTime) << 32LL);
+	ll_now = ll_now / 10000;
+	msec = convertInt(ll_now);
+	msec = msec + ".txt";
+	fs.open(msec.c_str(), ios::app);
 
 	// Sensor
 	IKinectSensor* pSensor;
@@ -99,10 +125,6 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	while (1){
 
-		if (cv::waitKey(2010) == VK_SPACE){
-			Sleep(2000);
-			std::cout << "Processing Frame" << std::endl;
-
 			// Color Frame to Body Frame Size
 			IColorFrame* pColorFrame = nullptr;
 			hresult = pColorReader->AcquireLatestFrame(&pColorFrame);
@@ -121,11 +143,18 @@ int _tmain(int argc, _TCHAR* argv[])
 				IBody* pBody[BODY_COUNT] = { 0 };
 				hresult = pBodyFrame->GetAndRefreshBodyData(BODY_COUNT, pBody);
 				if (SUCCEEDED(hresult)){
+                    //GetTime
+					GetLocalTime(&st);
+					GetSystemTimeAsFileTime(&ft_now);
+					ll_now = (LONGLONG)ft_now.dwLowDateTime + ((LONGLONG)(ft_now.dwHighDateTime) << 32LL);
+					ll_now = ll_now / 10000;
+
 					for (int count = 0; count < BODY_COUNT; count++){
 						BOOLEAN bTracked = false;
 						hresult = pBody[count]->get_IsTracked(&bTracked);
 						if (SUCCEEDED(hresult) && bTracked){
 							std::cout <<"Body "<<count<<" is being tracked"<< std::endl;
+							fs << ll_now << " " << st.wYear << " " << st.wMonth << " " << st.wDay << " " << st.wHour << " " << st.wMinute << " " << st.wSecond << " " << st.wMilliseconds << " " << count << " ";
 							Joint joint[JointType::JointType_Count];
 							hresult = pBody[count]->GetJoints(JointType::JointType_Count, joint);
 							if (SUCCEEDED(hresult)){
@@ -135,6 +164,8 @@ int _tmain(int argc, _TCHAR* argv[])
 									std::cout << " X " << joint[type].Position.X;
 									std::cout << " Y " << joint[type].Position.Y;
 									std::cout << " Z " << joint[type].Position.Z << std::endl;
+									// Tracking State: 0 NotTracked 1 Inferred 2 Tracked
+									fs << type << " " << joint[type].TrackingState << " " << joint[type].Position.X << " " << joint[type].Position.Y << " " << joint[type].Position.Z << " ";
 									ColorSpacePoint colorSpacePoint = { 0 };
 									pCoordinateMapper->MapCameraPointToColorSpace(joint[type].Position, &colorSpacePoint);
 									int x = static_cast<int>(colorSpacePoint.X);
@@ -144,6 +175,7 @@ int _tmain(int argc, _TCHAR* argv[])
 									}
 								}
 							}
+							fs << endl;
 						}
 					}
 
@@ -159,7 +191,6 @@ int _tmain(int argc, _TCHAR* argv[])
 			SafeRelease(pBodyFrame);
 
 			cv::imshow("Body", bodyMat);
-		}
 
 
 
@@ -169,6 +200,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	}
 
+	fs.close();
 	SafeRelease(pColorSource);
 	SafeRelease(pBodySource);
 	SafeRelease(pColorReader);
