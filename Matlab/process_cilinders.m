@@ -24,14 +24,47 @@ for i=1:length(P)
     hold on;
     plotCamera('Location',pos_cam1,'Orientation',T1(1:3,1:3),'Opacity',0,'Size',0.1);    
     color2=color(P(i,10)+1,:);
+    k=1;
     for j=11:5:131
         if (P(i,j+1)==2)
             axis([ -2 2 0 2 0 2]);
             view(3);             
             PP=T1*[P(i,j+2),P(i,j+3),P(i,j+4),1]';
-            plot3(PP(1),PP(2),PP(3),'o','Color',color2);
+            plot3(PP(1),PP(2),PP(3),'o','Color',color2);            
+            PT(k,:)=PP;
+            k=k+1;
         end
     end
+    % Cilindrization of human figures
+    h=0;
+    dx=0;
+    dy=0;
+    for kk=1:k-1
+        if PT(kk,3)>h
+            h=PT(kk,3);
+        end
+    end
+
+    xc=mean(PT(1:k-1,1));
+    yc=mean(PT(1:k-1,2));
+    
+    rr=0;
+    for kk=1:k-1
+        tr=sqrt((PT(kk,1)-xc)*(PT(kk,1)-xc)+(PT(kk,2)-yc)*(PT(kk,2)-yc));
+        if tr>rr
+            rr=tr;
+        end        
+    end
+    
+    theta = 0:0.05:2*pi;
+    Xx = rr*cos(theta)+xc;
+    Yy = rr*sin(theta)+yc;
+    Yy(end) = yc;
+    z1 = 0;
+    z2 = h;
+    
+    patch(Xx,Yy,z2*ones(size(Xx)),'FaceColor',color2,'FaceAlpha',1);
+    surf([Xx;Xx],[Yy;Yy],[z1*ones(size(Xx));z2*ones(size(Xx))],'FaceColor',color2,'FaceAlpha',1);
     if P(i,1)>nsec
     nsec=P(i,1);
     pause(0.01);
