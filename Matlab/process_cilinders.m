@@ -27,6 +27,7 @@ for i=1:length(P)
     k=1;
     for j=11:5:131
         if (P(i,j+1)==2)
+            axis equal;
             axis([ -2 2 0 2 0 2]);
             view(3);             
             PP=T1*[P(i,j+2),P(i,j+3),P(i,j+4),1]';
@@ -67,7 +68,7 @@ for i=1:length(P)
     surf([Xx;Xx],[Yy;Yy],[z1*ones(size(Xx));z2*ones(size(Xx))],'FaceColor',color2,'FaceAlpha',1);
     if P(i,1)>nsec
     nsec=P(i,1);
-    pause(0.01);
+    pause(0.05);
     clf;
     end
 end
