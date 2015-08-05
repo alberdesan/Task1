@@ -45,7 +45,7 @@ T2=[ cos(y)*cos(r)	sin(y)*sin(p)-cos(y)*sin(r)*cos(p)	sin(y)*cos(p)+cos(y)*sin(r
              
         
      
-P=load('Exp1E.mat');
+P=load('Exp1EC.mat');
 color=[1 0 0;0 1 0;0 0 1; 1 1 0;1 0 1; 0 1 1];
 figure();
 hold on;
