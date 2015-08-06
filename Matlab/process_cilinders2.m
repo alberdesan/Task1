@@ -27,7 +27,7 @@ T2=[ cos(y)*cos(r)	sin(y)*sin(p)-cos(y)*sin(r)*cos(p)	sin(y)*cos(p)+cos(y)*sin(r
              
         
      
-P=load('Exp1EC.mat');
+P=load('Exp3EC.mat');
 color=[1 0 0;0 1 0;0 0 1; 1 1 0;1 0 1; 0 1 1];
 figure();
 hold on;
@@ -44,7 +44,7 @@ for i=1:length(P.V)
         if (P.V(i,j+1)==2)
             axis equal;
             axis([ -2 3 0 3 0 3]);
-            view(3);
+            view(2);
             if P.V(i,1)==1
             PP=T1*[P.V(i,j+2),P.V(i,j+3),P.V(i,j+4),1]';
             end
@@ -89,7 +89,7 @@ for i=1:length(P.V)
     if P.V(i,2)>nsec || P.V(i,1)~=nk 
     nsec=P.V(i,2);
     nk=P.V(i,1);
-    pause(0.05);
+    pause(0.01);
     clf;
     end
 end
