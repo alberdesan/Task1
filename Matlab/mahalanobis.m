@@ -2,7 +2,7 @@ clear;
 
 NumbK=2;
 
-sig=0.3;
+sig=0.1;
 
 pos_cam1=[1,0,1];
 rpy_cam1=[180,0,0];
@@ -103,7 +103,7 @@ for i=1:length(P.V)
     
     rr=0;
     for kk=1:k-1
-        tr=sqrt((PT(kk,1)-xc)*(PT(kk,1)-xc)+(PT(kk,2)-yc)*(PT(kk,2)-yc));
+        tr=sqrt((PT(kk,1)-xc)*(PT(kk,1)-xc)+(PT(kk,2)-yc)*(PT(kk,2)-yc))*1.33;
         if tr>rr
             rr=tr;
         end        
@@ -150,20 +150,19 @@ for i=1:length(P.V)
             
             Mrr=0;
             Mh=0;
-            imrr=0;
-            imh=0;
+
             for j=1:NumbK
                 if H(j)~=0
-                    Mh=Mh+H(j);
-                    imh=imh+1;
+                    if H(j)>Mh
+                        Mh=H(j);
+                    end                    
                 end
                 if Rad(j)~=0
-                    Mrr=Mrr+Rad(j);
-                    imrr=imrr+1;
+                    if Rad(j)>Mrr
+                        Mrr=Rad(j);
+                    end   
                 end
             end
-            Mrr=Mrr/imrr;
-            Mh=Mh/imh;
             
             plot(xx(t),yy(t),'rx');
             
@@ -174,8 +173,8 @@ for i=1:length(P.V)
             z1 = 0;
             z2 = Mh;
             
-            patch(Xx,Yy,z2*ones(size(Xx)),'FaceColor',color2,'FaceAlpha',1);
-            surf([Xx;Xx],[Yy;Yy],[z1*ones(size(Xx));z2*ones(size(Xx))],'FaceColor',color2,'FaceAlpha',1);
+            patch(Xx,Yy,z2*ones(size(Xx)),'FaceColor',[1 0 0],'FaceAlpha',1);
+            surf([Xx;Xx],[Yy;Yy],[z1*ones(size(Xx));z2*ones(size(Xx))],'FaceColor',[1 0 0],'FaceAlpha',1);
             
             tra(tt,:)=[3,S(1),S(2),P.V(i-1,3)-idtm];
             tt=tt+1;
@@ -184,7 +183,7 @@ for i=1:length(P.V)
             trft(tf)=P.V(i-1,3)-idtm;
             tf=tf+1;
             
-            pause(0.01);
+            pause();
             clf;
             
             % PREDICTION
@@ -203,6 +202,10 @@ for i=1:length(P.V)
             disp('Update')
             [Oa,Ea]=kinect(xc,yc,xant(P.V(i,1)),yant(P.V(i,1)),Spred,sig);
             
+            
+            ([xc,yc,0,0]-[Spred(1),Spred(2),0,0])*Opred*([xc,yc,0,0]-[Spred(1),Spred(2),0,0])'
+            Opred
+            
             O=O+Oa;
             E=E+Ea;
             
@@ -215,6 +218,10 @@ for i=1:length(P.V)
                 % UPDATE
                 disp('Update')
                 [Oa,Ea]=kinect(xc,yc,xant(P.V(i,1)),yant(P.V(i,1)),Spred,sig);
+                
+                
+                ([xc,yc,0,0]-[Spred(1),Spred(2),0,0])*Opred*([xc,yc,0,0]-[Spred(1),Spred(2),0,0])'
+                Opred
                 
                 O=O+Oa;
                 E=E+Ea;
@@ -241,20 +248,19 @@ for i=1:length(P.V)
                 
                 Mrr=0;
                 Mh=0;
-                imrr=0;
-                imh=0;
+
                 for j=1:NumbK
                     if H(j)~=0
-                        Mh=Mh+H(j);
-                        imh=imh+1;
+                        if H(j)>Mh
+                            Mh=H(j);
+                        end
                     end
                     if Rad(j)~=0
-                        Mrr=Mrr+Rad(j);
-                        imrr=imrr+1;
+                        if Rad(j)>Mrr
+                            Mrr=Rad(j);
+                        end
                     end
                 end
-                Mrr=Mrr/imrr;
-                Mh=Mh/imh;
                 
                 plot(xx(t),yy(t),'rx');
                 
@@ -265,8 +271,8 @@ for i=1:length(P.V)
                 z1 = 0;
                 z2 = Mh;
                 
-                patch(Xx,Yy,z2*ones(size(Xx)),'FaceColor',color2,'FaceAlpha',1);
-                surf([Xx;Xx],[Yy;Yy],[z1*ones(size(Xx));z2*ones(size(Xx))],'FaceColor',color2,'FaceAlpha',1);
+                patch(Xx,Yy,z2*ones(size(Xx)),'FaceColor',[1 0 0],'FaceAlpha',1);
+                surf([Xx;Xx],[Yy;Yy],[z1*ones(size(Xx));z2*ones(size(Xx))],'FaceColor',[1 0 0],'FaceAlpha',1);
                 
                 tra(tt,:)=[3,S(1),S(2),P.V(i,3)-idtm];
                 tt=tt+1; 
@@ -278,7 +284,7 @@ for i=1:length(P.V)
                 lastk=newk;
                 f=1;
                 
-                pause(0.01);
+                pause();
                 clf;
             else
                 % PREDICTION
@@ -296,6 +302,10 @@ for i=1:length(P.V)
                 % UPDATE
                 disp('Update')
                 [Oa,Ea]=kinect(xc,yc,xant(P.V(i,1)),yant(P.V(i,1)),Spred,sig);
+                
+                
+                ([xc,yc,0,0]-[Spred(1),Spred(2),0,0])*Opred*([xc,yc,0,0]-[Spred(1),Spred(2),0,0])'
+                Opred
                 
                 O=O+Oa;
                 E=E+Ea;
@@ -324,6 +334,10 @@ for i=1:length(P.V)
             % UPDATE
             disp('Update')
             [Oa,Ea]=kinect(xc,yc,xant(P.V(i,1)),yant(P.V(i,1)),Spred,sig);
+            
+            
+            ([xc,yc,0,0]-[Spred(1),Spred(2),0,0])*Opred*([xc,yc,0,0]-[Spred(1),Spred(2),0,0])'
+            Opred
             
             O=O+Oa;
             E=E+Ea;
@@ -359,8 +373,8 @@ for i=1:length(P.V)
             z1 = 0;
             z2 = h;
             
-            patch(Xx,Yy,z2*ones(size(Xx)),'FaceColor',color2,'FaceAlpha',1);
-            surf([Xx;Xx],[Yy;Yy],[z1*ones(size(Xx));z2*ones(size(Xx))],'FaceColor',color2,'FaceAlpha',1);
+            patch(Xx,Yy,z2*ones(size(Xx)),'FaceColor',[1 0 0],'FaceAlpha',1);
+            surf([Xx;Xx],[Yy;Yy],[z1*ones(size(Xx));z2*ones(size(Xx))],'FaceColor',[1 0 0],'FaceAlpha',1);
             
             tra(tt,:)=[3,xc,yc,P.V(i,3)-idtm];
             tt=tt+1;
@@ -376,7 +390,7 @@ for i=1:length(P.V)
             end
         
             lastk=newk;
-            pause(0.01);
+            pause();
             clf;
         end
     else
@@ -406,8 +420,8 @@ for i=1:length(P.V)
         z1 = 0;
         z2 = h;
         
-        patch(Xx,Yy,z2*ones(size(Xx)),'FaceColor',color2,'FaceAlpha',1);
-        surf([Xx;Xx],[Yy;Yy],[z1*ones(size(Xx));z2*ones(size(Xx))],'FaceColor',color2,'FaceAlpha',1);
+        patch(Xx,Yy,z2*ones(size(Xx)),'FaceColor',[1 0 0],'FaceAlpha',1);
+        surf([Xx;Xx],[Yy;Yy],[z1*ones(size(Xx));z2*ones(size(Xx))],'FaceColor',[1 0 0],'FaceAlpha',1);
         
         tra(tt,:)=[3,xc,yc,P.V(i,3)-idtm];
         tt=tt+1;
@@ -423,34 +437,12 @@ for i=1:length(P.V)
         end
         
         lastk=newk;
-        pause(0.01)
+        pause();
+        clf;
     end
     dtm=dtp;
 
-    
-    
-
-    
-    theta = 0:0.05:2*pi;
-    Xx = rr*cos(theta)+xc;
-    Yy = rr*sin(theta)+yc;
-    Yy(end) = yc;
-    z1 = 0;
-    z2 = h;
-    
-    patch(Xx,Yy,z2*ones(size(Xx)),'FaceColor',color2,'FaceAlpha',1);
-    surf([Xx;Xx],[Yy;Yy],[z1*ones(size(Xx));z2*ones(size(Xx))],'FaceColor',color2,'FaceAlpha',1);
-    if P.V(i,2)>nsec || P.V(i,1)~=nk 
-    nsec=P.V(i,2);
-    nk=P.V(i,1);
-    pause(0.01);
-    clf;
-    end
 end
-figure
-plot(xx)
-figure
-plot(yy)
 
 figure()
 hold on;

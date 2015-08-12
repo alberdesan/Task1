@@ -68,7 +68,7 @@ for i=1:length(P)
     surf([Xx;Xx],[Yy;Yy],[z1*ones(size(Xx));z2*ones(size(Xx))],'FaceColor',color2,'FaceAlpha',1);
     if P(i,1)>nsec
     nsec=P(i,1);
-    pause(0.05);
+    pause();
     clf;
     end
 end

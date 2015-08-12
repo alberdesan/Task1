@@ -48,7 +48,7 @@ etiq(2) = text('String','Y');
 etiq(3) = text('String','Z');
 
 % Se etiquetan los ejes del sistema universal
-xlabel('Eje X'), ylabel('Eje Y'), zlabel('Eje Z')
+xlabel('X Axis'), ylabel('Y Axis'), zlabel('Z Axis')
 
 % Para toda la trayectoria de transformaciones se efectua la representación
 for (k=1:np)

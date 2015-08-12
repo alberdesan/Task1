@@ -202,6 +202,14 @@ for i=1:length(P.V)
             disp('Update')
             [Oa,Ea]=kinect(xc,yc,xant(P.V(i,1)),yant(P.V(i,1)),Spred,sig);
             
+            
+            [xc,yc,xant(P.V(i,1)),yant(P.V(i,1))]
+            Spred
+            [xc,yc,xant(P.V(i,1)),yant(P.V(i,1))]-Spred'
+            O
+            ([xc,yc,xant(P.V(i,1)),yant(P.V(i,1))]-Spred')*O*([xc,yc,xant(P.V(i,1)),yant(P.V(i,1))]-Spred')'
+            pause();
+            
             O=O+Oa;
             E=E+Ea;
             
@@ -214,6 +222,9 @@ for i=1:length(P.V)
                 % UPDATE
                 disp('Update')
                 [Oa,Ea]=kinect(xc,yc,xant(P.V(i,1)),yant(P.V(i,1)),Spred,sig);
+                
+                
+                ([xc,yc,0,0]-[Spred(1),Spred(2),0,0]')*O*([xc,yc,0,0]-[Spred(1),Spred(2),0,0]')'
                 
                 O=O+Oa;
                 E=E+Ea;
@@ -295,6 +306,14 @@ for i=1:length(P.V)
                 disp('Update')
                 [Oa,Ea]=kinect(xc,yc,xant(P.V(i,1)),yant(P.V(i,1)),Spred,sig);
                 
+                
+                [xc,yc,xant(P.V(i,1)),yant(P.V(i,1))]
+                Spred
+                [xc,yc,xant(P.V(i,1)),yant(P.V(i,1))]-Spred'
+                O
+                ([xc,yc,xant(P.V(i,1)),yant(P.V(i,1))]-Spred')*O*([xc,yc,xant(P.V(i,1)),yant(P.V(i,1))]-Spred')'
+                pause();
+                
                 O=O+Oa;
                 E=E+Ea;
                 
@@ -322,6 +341,14 @@ for i=1:length(P.V)
             % UPDATE
             disp('Update')
             [Oa,Ea]=kinect(xc,yc,xant(P.V(i,1)),yant(P.V(i,1)),Spred,sig);
+            
+            
+            [xc,yc,xant(P.V(i,1)),yant(P.V(i,1))]
+            Spred
+            [xc,yc,xant(P.V(i,1)),yant(P.V(i,1))]-Spred'
+            O
+            ([xc,yc,xant(P.V(i,1)),yant(P.V(i,1))]-Spred')*O*([xc,yc,xant(P.V(i,1)),yant(P.V(i,1))]-Spred')'
+            pause();
             
             O=O+Oa;
             E=E+Ea;

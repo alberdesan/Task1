@@ -1,3 +1,0 @@
-clear;
-P1=load('Exp1K1.txt');
-P2=load('Exp1K2.txt');

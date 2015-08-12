@@ -1,6 +1,6 @@
-function [Oa,Ea]=kinect(x,y,xant,yant,Spred1,sig)
+function [Oa,Ea]=kinect(x,y,xant,yant,Spred,sig)
 
-Oa=[0 0 0 0;0 0 0 0;0 0 0 0;0 0 0 0;0 0 0 0;0 0 0 0];
+Oa=[0 0 0 0;0 0 0 0;0 0 0 0;0 0 0 0];
 Ea=[0 0 0 0]';
 
 % Measurement covariance matrix
@@ -24,11 +24,11 @@ P(2)  = y;
 P(3)  = xant;
 P(4)  = yant;
   
-Salida_predicha(1) = Spred1sal1(1)/sal1(3);
-Salida_predicha(2) = sal1(2)/sal1(3);
-Salida_predicha(3) = sal2(1)/sal2(3);
-Salida_predicha(4) = sal2(2)/sal2(3);
+Salida_predicha(1) = Spred(1);
+Salida_predicha(2) = Spred(2);
+Salida_predicha(3) = Spred(3);
+Salida_predicha(4) = Spred(4);
 Oa=H'*inv(R)*H;
-Ea=H'*inv(R)*(P' - Salida_predicha' + H*Spred1);   
+Ea=H'*inv(R)*(P' - Salida_predicha' + H*Spred);   
 
 end

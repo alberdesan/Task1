@@ -1,5 +1,9 @@
 clear;
 
+writerObj = VideoWriter('filter.avi');
+writerObj.FrameRate = 20;
+open(writerObj);
+
 NumbK=2;
 
 sig=0.1;
@@ -48,6 +52,8 @@ T2=[ cos(y)*cos(r)	sin(y)*sin(p)-cos(y)*sin(r)*cos(p)	sin(y)*cos(p)+cos(y)*sin(r
 P=load('Exp1EC.mat');
 color=[1 0 0;0 1 0;0 0 1; 1 1 0;1 0 1; 0 1 1];
 figure();
+set(gca,'nextplot','replacechildren');
+set(gcf,'Renderer','zbuffer');
 hold on;
 
 lastk=0;
@@ -76,7 +82,7 @@ for i=1:length(P.V)
         if (P.V(i,j+1)==2)
             axis equal;
             axis([ -2 3 0 3 0 3]);
-            view(2);
+            view(3);
             if P.V(i,1)==1
             PP=T1*[P.V(i,j+2),P.V(i,j+3),P.V(i,j+4),1]';
             end
@@ -182,8 +188,10 @@ for i=1:length(P.V)
             trfy(tf)=S(2);
             trft(tf)=P.V(i-1,3)-idtm;
             tf=tf+1;
-            
-            pause();
+ 
+            frame = getframe;
+            writeVideo(writerObj,frame);
+            pause(0.01);
             clf;
             
             % PREDICTION
@@ -276,7 +284,9 @@ for i=1:length(P.V)
                 lastk=newk;
                 f=1;
                 
-                pause();
+                frame = getframe;
+                writeVideo(writerObj,frame);               
+                pause(0.01);
                 clf;
             else
                 % PREDICTION
@@ -374,7 +384,9 @@ for i=1:length(P.V)
             end
         
             lastk=newk;
-            pause();
+            frame = getframe;
+            writeVideo(writerObj,frame);           
+            pause(0.01);
             clf;
         end
     else
@@ -421,12 +433,16 @@ for i=1:length(P.V)
         end
         
         lastk=newk;
-        pause();
+        frame = getframe;
+        writeVideo(writerObj,frame);
+        pause(0.01);
         clf;
     end
     dtm=dtp;
 
 end
+
+close(writerObj)
 
 figure()
 hold on;

@@ -27,7 +27,7 @@ T2=[ cos(y)*cos(r)	sin(y)*sin(p)-cos(y)*sin(r)*cos(p)	sin(y)*cos(p)+cos(y)*sin(r
              
         
      
-P=load('Exp3EC.mat');
+P=load('Exp1EC.mat');
 color=[1 0 0;0 1 0;0 0 1; 1 1 0;1 0 1; 0 1 1];
 figure();
 hold on;
@@ -89,7 +89,10 @@ for i=1:length(P.V)
     if P.V(i,2)>nsec || P.V(i,1)~=nk 
     nsec=P.V(i,2);
     nk=P.V(i,1);
-    pause(0.01);
-    clf;
+    pause();
+    if P.V(i,3)-P.V(i-1,3)>50
+        clf;
+    end
+    %clf;
     end
 end

@@ -1,8 +1,13 @@
 clear;
-pos_cam1=[0,0,1];
+
+writerObj = VideoWriter('cylinders.avi');
+writerObj.FrameRate = 25;
+open(writerObj);
+
+pos_cam1=[1,0,1];
 rpy_cam1=[180,0,0];
 
-pos_cam2=[1,0,1];
+pos_cam2=[0,0,1];
 rpy_cam2=[180,0,0];
 
 % Camera 1 transformation matrix
@@ -27,12 +32,14 @@ T2=[ cos(y)*cos(r)	sin(y)*sin(p)-cos(y)*sin(r)*cos(p)	sin(y)*cos(p)+cos(y)*sin(r
              
         
      
-P=load('Exp1E.mat');
+P=load('Exp1EC.mat');
 color=[1 0 0;0 1 0;0 0 1; 1 1 0;1 0 1; 0 1 1];
 figure();
+set(gca,'nextplot','replacechildren');
+set(gcf,'Renderer','zbuffer');
 hold on;
 
-nsec=P.(1,2);
+nsec=P.V(1,2);
 nk=P.V(1,1);
 for i=1:length(P.V)
     hold on;
@@ -43,9 +50,14 @@ for i=1:length(P.V)
     for j=12:5:133
         if (P.V(i,j+1)==2)
             axis equal;
-            axis([ -2 2 0 2 0 2]);
-            view(3);             
+            axis([ -2 3 0 3 0 3]);
+            view(3);
+            if P.V(i,1)==1
             PP=T1*[P.V(i,j+2),P.V(i,j+3),P.V(i,j+4),1]';
+            end
+            if P.V(i,1)==2
+            PP=T2*[P.V(i,j+2),P.V(i,j+3),P.V(i,j+4),1]';
+            end          
             plot3(PP(1),PP(2),PP(3),'o','Color',color2);            
             PT(k,:)=PP;
             k=k+1;
@@ -84,7 +96,11 @@ for i=1:length(P.V)
     if P.V(i,2)>nsec || P.V(i,1)~=nk 
     nsec=P.V(i,2);
     nk=P.V(i,1);
-    pause(0.05);
+    frame = getframe;
+    writeVideo(writerObj,frame);    
+    pause(0.01);
     clf;
     end
 end
+
+close(writerObj);
