@@ -3,7 +3,10 @@
 #include "stdafx.h"
 #include <Windows.h>
 #include <Kinect.h>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2\video\video.hpp>
 #include <opencv2/opencv.hpp>
+#include <opencv2\videostab\videostab.hpp>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -34,6 +37,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	int64 nsec = 0;
 	ofstream fs;
 	string msec;
+	string vidf;
 	FILETIME ft_now;
 	SYSTEMTIME st;
 	GetSystemTimeAsFileTime(&ft_now);
@@ -41,8 +45,12 @@ int _tmain(int argc, _TCHAR* argv[])
 	ll_now = (LONGLONG)ft_now.dwLowDateTime + ((LONGLONG)(ft_now.dwHighDateTime) << 32LL);
 	ll_now = ll_now / 10000;
 	msec = convertInt(ll_now);
+	vidf = msec;
+	vidf = vidf + ".avi";
 	msec = msec + ".txt";
 	fs.open(msec.c_str(), ios::app);
+	CvSize size;
+
 
 	// Sensor
 	IKinectSensor* pSensor;
@@ -101,6 +109,14 @@ int _tmain(int argc, _TCHAR* argv[])
 	int height = 0;
 	pDescription->get_Width(&width); //1920
 	pDescription->get_Height(&height); //1080
+	size.height = height/2;
+	size.width = width/2;
+	cv::VideoWriter vid;
+
+	vid.open(vidf,-1,30, size,true);
+	if (vid.isOpened()){
+		std::cout <<"video is open"<< endl;
+	}
 	unsigned int bufferSize = width*height * 4 * sizeof(unsigned char);
 
 	cv::Mat bufferMat(height, width, CV_8UC4);
@@ -193,10 +209,10 @@ int _tmain(int argc, _TCHAR* argv[])
 			SafeRelease(pBodyFrame);
 
 			cv::imshow("Body", bodyMat);
-
-
+			vid.write(bodyMat);
 
 		if (cv::waitKey(10) == VK_ESCAPE){
+			vid.release();
 			break;
 		}
 
