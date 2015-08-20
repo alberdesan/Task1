@@ -3,14 +3,11 @@
 #include "stdafx.h"
 #include <Windows.h>
 #include <Kinect.h>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2\video\video.hpp>
-#include <opencv2/opencv.hpp>
-#include <opencv2\videostab\videostab.hpp>
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <time.h>
+#include <opencv2\opencv.hpp>
 using namespace std;
 
 
@@ -27,6 +24,14 @@ string convertInt(int64 number)
 	stringstream ss; //create a stringstream
 	ss << number; //add number to the stream
 	return ss.str(); //return a string with the contents of the stream
+}
+
+void addFrameToVideo(cv::VideoWriter vid,cv::Mat frame,string name,CvSize size)
+{
+		if (vid.isOpened()){
+			cout << "yes" << endl;
+			vid.write(frame);
+		}
 }
 
 int _tmain(int argc, _TCHAR* argv[])
@@ -113,14 +118,14 @@ int _tmain(int argc, _TCHAR* argv[])
 	size.width = width/2;
 	cv::VideoWriter vid;
 
-	vid.open(vidf,-1,30, size,true);
+	vid.open(vidf,-1, 30, size, true);
 	if (vid.isOpened()){
 		std::cout <<"video is open"<< endl;
 	}
 	unsigned int bufferSize = width*height * 4 * sizeof(unsigned char);
 
 	cv::Mat bufferMat(height, width, CV_8UC4);
-	cv::Mat bodyMat(height / 2, width / 2, CV_8UC4);
+	cv::Mat bodyMat(height/2, width/2, CV_8UC4);
 	cv::namedWindow("Body");
 
 	// Color Table
@@ -197,7 +202,7 @@ int _tmain(int argc, _TCHAR* argv[])
 						}
 					}
 
-					cv::resize(bufferMat, bodyMat, cv::Size(), 0.5, 0.5);
+					cv::resize(bufferMat, bodyMat,size, 0.5, 0.5);
 
 				}
 				for (int count = 0; count < BODY_COUNT; count++){
@@ -209,7 +214,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			SafeRelease(pBodyFrame);
 
 			cv::imshow("Body", bodyMat);
-			vid.write(bodyMat);
+			addFrameToVideo(vid, bodyMat, vidf, size);
 
 		if (cv::waitKey(10) == VK_ESCAPE){
 			vid.release();
