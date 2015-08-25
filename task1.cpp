@@ -20,8 +20,9 @@ using namespace std;
 #pragma comment (lib, "Mswsock.lib")
 #pragma comment (lib, "AdvApi32.lib")
 
-#define DEFAULT_BUFLEN 512
+#define DEFAULT_BUFLEN 1024
 #define DEFAULT_PORT "27015"
+#define KIN 1
 
 
 template<class Interface>
@@ -42,12 +43,11 @@ string convertInt(int64 number)
 void addFrameToVideo(cv::VideoWriter vid,cv::Mat frame,string name,CvSize size)
 {
 		if (vid.isOpened()){
-			cout << "yes" << endl;
 			vid.write(frame);
 		}
 }
 
-int _tmain(int argc, char **argv)
+int __cdecl main(int argc, char **argv)
 {
 	cv::setUseOptimized(true);
 
@@ -75,9 +75,7 @@ int _tmain(int argc, char **argv)
 	struct addrinfo *result = NULL;
 	struct addrinfo	*ptr = NULL;
 	struct addrinfo hints;
-	char recvbuf[DEFAULT_BUFLEN];
 	int iResult;
-	int recvbuflen = DEFAULT_BUFLEN;
 
 	/*Kinect Configuration*/
 	// Sensor
@@ -261,7 +259,10 @@ int _tmain(int argc, char **argv)
 						hresult = pBody[count]->get_IsTracked(&bTracked);
 						if (SUCCEEDED(hresult) && bTracked){
 							std::cout <<"Body "<<count<<" is being tracked"<< std::endl;
+							stringstream temp_str;
+
 							fs << nsec << " " << ll_now << " " << st.wYear << " " << st.wMonth << " " << st.wDay << " " << st.wHour << " " << st.wMinute << " " << st.wSecond << " " << st.wMilliseconds << " " << count << " ";
+							temp_str<< KIN << " " << nsec << " " << ll_now << " " << st.wYear << " " << st.wMonth << " " << st.wDay << " " << st.wHour << " " << st.wMinute << " " << st.wSecond << " " << st.wMilliseconds << " " << count << " ";
 							Joint joint[JointType::JointType_Count];
 							hresult = pBody[count]->GetJoints(JointType::JointType_Count, joint);
 							if (SUCCEEDED(hresult)){
@@ -273,6 +274,7 @@ int _tmain(int argc, char **argv)
 									std::cout << " Z " << joint[type].Position.Z << std::endl;
 									// Tracking State: 0 NotTracked 1 Inferred 2 Tracked
 									fs << type << " " << joint[type].TrackingState << " " << joint[type].Position.X << " " << joint[type].Position.Y << " " << joint[type].Position.Z << " ";
+									temp_str << type << " " << joint[type].TrackingState << " " << joint[type].Position.X << " " << joint[type].Position.Y << " " << joint[type].Position.Z << " ";
 									ColorSpacePoint colorSpacePoint = { 0 };
 									pCoordinateMapper->MapCameraPointToColorSpace(joint[type].Position, &colorSpacePoint);
 									int x = static_cast<int>(colorSpacePoint.X);
@@ -283,6 +285,19 @@ int _tmain(int argc, char **argv)
 								}
 							}
 							fs << endl;
+
+							std::string str = temp_str.str();
+							const char* sendbuf = str.c_str();
+
+							// Send buffer
+							iResult = send(ConnectSocket, sendbuf, (int)strlen(sendbuf), 0);
+							if (iResult == SOCKET_ERROR) {
+								printf("send failed with error: %d\n", WSAGetLastError());
+								closesocket(ConnectSocket);
+								WSACleanup();
+								return 1;
+							}
+							printf("Bytes Sent: %ld\n", iResult);
 						}
 					}
 
@@ -306,6 +321,19 @@ int _tmain(int argc, char **argv)
 		}
 
 	}
+
+	// shutdown the connection since no more data will be sent
+	iResult = shutdown(ConnectSocket, SD_SEND);
+	if (iResult == SOCKET_ERROR) {
+		printf("shutdown failed with error: %d\n", WSAGetLastError());
+		closesocket(ConnectSocket);
+		WSACleanup();
+		return 1;
+	}
+
+	// cleanup
+	closesocket(ConnectSocket);
+	WSACleanup();
 
 	fs.close();
 	SafeRelease(pColorSource);
