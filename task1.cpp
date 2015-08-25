@@ -1,8 +1,8 @@
 // task1.cpp
 
-#define WIN32_LEAN_AND_MEAN
-
 #include "stdafx.h"
+#include <winsock2.h>
+#include <ws2tcpip.h>
 #include <Windows.h>
 #include <Kinect.h>
 #include <iostream>
@@ -11,8 +11,6 @@
 #include <iostream>
 #include <time.h>
 #include <opencv2\opencv.hpp>
-#include <winsock2.h>
-#include <ws2tcpip.h>
 #include <stdlib.h>
 #include <stdio.h>
 using namespace std;
@@ -49,11 +47,11 @@ void addFrameToVideo(cv::VideoWriter vid,cv::Mat frame,string name,CvSize size)
 		}
 }
 
-int _tmain(int argc, _TCHAR* argv[])
+int _tmain(int argc, char **argv)
 {
 	cv::setUseOptimized(true);
 
-	// File
+	// File definitions
 	int64 nsec = 0;
 	ofstream fs;
 	string msec;
@@ -71,7 +69,17 @@ int _tmain(int argc, _TCHAR* argv[])
 	fs.open(msec.c_str(), ios::app);
 	CvSize size;
 
+	// Client definitions
+	WSADATA wsaData;
+	SOCKET ConnectSocket = INVALID_SOCKET;
+	struct addrinfo *result = NULL;
+	struct addrinfo	*ptr = NULL;
+	struct addrinfo hints;
+	char recvbuf[DEFAULT_BUFLEN];
+	int iResult;
+	int recvbuflen = DEFAULT_BUFLEN;
 
+	/*Kinect Configuration*/
 	// Sensor
 	IKinectSensor* pSensor;
 	HRESULT hresult = S_OK;
@@ -159,6 +167,67 @@ int _tmain(int argc, _TCHAR* argv[])
 		std::cerr << "Error : IKinectSensor::get_CoordinateMapper()" << std::endl;
 		return -1;
 	}
+	/*End of Kinect Configuration*/
+
+	/* Client Configuration */
+
+	// Validate the parameters
+	if (argc != 2) {
+		printf("usage: %s server-name\n", argv[0]);
+		return 1;
+	}
+
+	// Initialize Winsock
+	iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
+	if (iResult != 0) {
+		printf("WSAStartup failed with error: %d\n", iResult);
+		return 1;
+	}
+
+	ZeroMemory(&hints, sizeof(hints));
+	hints.ai_family = AF_UNSPEC;
+	hints.ai_socktype = SOCK_STREAM;
+	hints.ai_protocol = IPPROTO_TCP;
+
+	// Resolve the server address and port
+	iResult = getaddrinfo(argv[1], DEFAULT_PORT, &hints, &result);
+	if (iResult != 0) {
+		printf("getaddrinfo failed with error: %d\n", iResult);
+		WSACleanup();
+		return 1;
+	}
+
+	// Attempt to connect to an address until one succeeds
+	for (ptr = result; ptr != NULL; ptr = ptr->ai_next) {
+
+		// Create a SOCKET for connecting to server
+		ConnectSocket = socket(ptr->ai_family, ptr->ai_socktype,
+			ptr->ai_protocol);
+		if (ConnectSocket == INVALID_SOCKET) {
+			printf("socket failed with error: %ld\n", WSAGetLastError());
+			WSACleanup();
+			return 1;
+		}
+
+		// Connect to server.
+		iResult = connect(ConnectSocket, ptr->ai_addr, (int)ptr->ai_addrlen);
+		if (iResult == SOCKET_ERROR) {
+			closesocket(ConnectSocket);
+			ConnectSocket = INVALID_SOCKET;
+			continue;
+		}
+		break;
+	}
+
+	freeaddrinfo(result);
+
+	if (ConnectSocket == INVALID_SOCKET) {
+		printf("Unable to connect to server!\n");
+		WSACleanup();
+		return 1;
+	}
+
+	/*End of Client Configuration*/
 
 	while (1){
 
