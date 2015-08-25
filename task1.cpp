@@ -1,14 +1,29 @@
 // task1.cpp
 
+#define WIN32_LEAN_AND_MEAN
+
 #include "stdafx.h"
 #include <Windows.h>
 #include <Kinect.h>
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <iostream>
 #include <time.h>
 #include <opencv2\opencv.hpp>
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#include <stdlib.h>
+#include <stdio.h>
 using namespace std;
+
+// Need to link with Ws2_32.lib, Mswsock.lib, and Advapi32.lib
+#pragma comment (lib, "Ws2_32.lib")
+#pragma comment (lib, "Mswsock.lib")
+#pragma comment (lib, "AdvApi32.lib")
+
+#define DEFAULT_BUFLEN 512
+#define DEFAULT_PORT "27015"
 
 
 template<class Interface>
