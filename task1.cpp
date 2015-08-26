@@ -262,7 +262,7 @@ int __cdecl main(int argc, char **argv)
 							stringstream temp_str;
 
 							fs << nsec << " " << ll_now << " " << st.wYear << " " << st.wMonth << " " << st.wDay << " " << st.wHour << " " << st.wMinute << " " << st.wSecond << " " << st.wMilliseconds << " " << count << " ";
-							temp_str<< KIN << " " << nsec << " " << ll_now << " " << st.wYear << " " << st.wMonth << " " << st.wDay << " " << st.wHour << " " << st.wMinute << " " << st.wSecond << " " << st.wMilliseconds << " " << count << " ";
+							temp_str<< KIN << " " << ll_now << " ";
 							Joint joint[JointType::JointType_Count];
 							hresult = pBody[count]->GetJoints(JointType::JointType_Count, joint);
 							if (SUCCEEDED(hresult)){
@@ -274,7 +274,7 @@ int __cdecl main(int argc, char **argv)
 									std::cout << " Z " << joint[type].Position.Z << std::endl;
 									// Tracking State: 0 NotTracked 1 Inferred 2 Tracked
 									fs << type << " " << joint[type].TrackingState << " " << joint[type].Position.X << " " << joint[type].Position.Y << " " << joint[type].Position.Z << " ";
-									temp_str << type << " " << joint[type].TrackingState << " " << joint[type].Position.X << " " << joint[type].Position.Y << " " << joint[type].Position.Z << " ";
+									temp_str << joint[type].TrackingState << " " << joint[type].Position.X << " " << joint[type].Position.Y << " " << joint[type].Position.Z << " ";
 									ColorSpacePoint colorSpacePoint = { 0 };
 									pCoordinateMapper->MapCameraPointToColorSpace(joint[type].Position, &colorSpacePoint);
 									int x = static_cast<int>(colorSpacePoint.X);
